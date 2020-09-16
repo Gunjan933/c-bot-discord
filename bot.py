@@ -36,13 +36,21 @@ async def ping(ctx):
 async def shutdown(ctx):
   if int(ctx.message.author.id) == int(OWNERID):
     try:
+      await ctx.send("Shutting down!")
       await bot.logout()
-      print("shutting down")
     except:
+      await ctx.send("Environment Error")
       bot.clear()
-      print("Environment Error")
   else:
     await ctx.send("You do not own this bot!")
+
+channel = discord.utils.get(guild.text_channels, name="new-joiners")
+print(channel.id)
+# @commands.Cog.listener()
+# async def on_member_join(self, member):
+#     ment = member.mention
+#     await self.client.get_channel(channel id).send(f"{ment} has joined the server.")
+#     print(f"{member} has joined the server.")
 
 
 bot.remove_command('help')
