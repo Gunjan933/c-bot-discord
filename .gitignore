@@ -1,7 +1,7 @@
 # google service account credentials
 cainvas-scholar.json
 # cainvas_scholar database
-cainvas_scholar.db
+cainvas-scholar-database.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
