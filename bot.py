@@ -1,4 +1,4 @@
-import os, random, discord
+import os, random, discord, asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -8,6 +8,8 @@ database = bot_database()
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 OWNERID = os.getenv('OWNERID')
+SYNC_AFTER = 15*60   #15 minutes
+
 
 bot = commands.Bot(command_prefix='-')
 
@@ -18,55 +20,46 @@ def admin(ctx):
   return ctx.message.author.guild_permissions.administrator
 
 def current_user(ctx):
-  return "{}#{}".format(ctx.message.author.name, ctx.message.author.id)
+  return str(ctx.message.author)
+
+async def auto_sync():
+  await bot.wait_until_ready()
+  while not bot.is_closed():
+    if database.sync_with_spreadsheet():
+      print("Database synced")
+    else:
+      print("Database not synced")
+    await asyncio.sleep(SYNC_AFTER)
 
 @bot.event
 async def on_command_error(ctx, error):
   await ctx.send(f'Try `-help` \n[{error}]')
 
 @bot.command()
-async def hey(ctx):
-  hey_quotes = [
-    'I\'m the human form of the 💯 emoji.',
-    'Bingpot!',
-    (
-      'Cool. Cool cool cool cool cool cool cool, '
-      'no doubt no doubt no doubt no doubt.'
-    ),
-  ]
-
-  response = random.choice(hey_quotes)
-  await ctx.send(response)
-
-
-@bot.command()
 async def search(ctx, uniqueID=None):
   if not uniqueID:
     uniqueID = current_user(ctx)
-  df = database.search(uniqueID)
-  if not df.empty:
-    if admin(ctx):
-      response = df.to_string(index = False)
-    else:
-      columns = ['First Name', 'Last Name', 'cAInvas User Name', 'Email Address']
-      response = (df[columns]).to_string(index = False)
+  if admin(ctx):
+    await ctx.send(database.search(uniqueID, admin=True))
   else:
-    response = "No users found with {}".format(uniqueID)
-  await ctx.send(response)
+    await ctx.send(database.search(uniqueID, admin=False))
 
 
 @bot.command()
 async def sync(ctx):
-  if owner(ctx):
-    database.sync_with_spreadsheet()
-    await ctx.send(f'synced database')
+  if admin(ctx):
+    if database.sync_with_spreadsheet():
+      response = "Database synced"
+    else:
+      response = "Database not synced"
   else:
-    await ctx.send("You do not own this bot!")
+    response = "You are not an admin!"
+  await ctx.send(response)
 
 
 @bot.command()
 async def ping(ctx):
-  await ctx.send(f'~{round (bot.latency * 1000)}ms')
+  await ctx.send(f'{round (bot.latency * 1000)}ms')
 
 
 @bot.command()
@@ -81,28 +74,29 @@ async def shutdown(ctx):
   else:
     await ctx.send("You do not own this bot!")
 
-# channel = discord.utils.get(guild.text_channels, name="new-joiners")
-# print(channel.id)
+
 # @commands.Cog.listener()
 # async def on_member_join(self, member):
-#     ment = member.mention
-#     await self.client.get_channel(channel id).send(f"{ment} has joined the server.")
-#     print(f"{member} has joined the server.")
+#   channel = discord.utils.get(guild.text_channels, name="new-joiners")
+#   print(channel.id)
+#   ment = member.mention
+#   await self.client.get_channel(channel.id).send(f"{ment} has joined the server.")
+#   print(f"{member} has joined the server.")
 
 
 bot.remove_command('help')
-
 @bot.command(pass_context=True)
 async def help(ctx):
-    embed = discord.Embed(colour = discord.Colour.green())
-    embed.add_field(name='Cainvas Bot', value='Made with :heart: by **AITS**', inline=False)
-    embed.add_field(name='-help', value='list of commands available', inline=False)
-    embed.add_field(name='-ping', value='checks latency.', inline=False)
-    embed.add_field(name='-search', value='searches for user.', inline=False)
-    embed.add_field(name='-hey', value='generates random quote.', inline=False)
-    embed.add_field(name='-shutdown', value='shuts down cainvas bot', inline=False)
-    await ctx.send(embed=embed)
+  embed = discord.Embed(colour = discord.Colour.green())
+  embed.add_field(name='Cainvas Bot', value='Made with :heart: by **AITS**', inline=False)
+  embed.add_field(name='-help', value='list of commands available', inline=False)
+  embed.add_field(name='-search [discord ID | cainvas ID | email address]', value='searches for user', inline=False)
+  embed.add_field(name='-ping', value='checks latency.', inline=False)
+  embed.add_field(name='-sync', value='syncs database (requires admin privilage)', inline=False)
+  embed.add_field(name='-shutdown', value='shuts down cainvas bot (requires ownership privilage)', inline=False)
+  await ctx.send(embed=embed)
 
 
 
+bot.loop.create_task(auto_sync())
 bot.run(TOKEN)
