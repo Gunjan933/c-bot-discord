@@ -46,17 +46,16 @@ class bot_database:
       return "No users found with {}".format(uniqueID)
 
     df['Medium Username'] = "https://medium.com/{}".format(df._get_value(0, 'Medium Username'))
-    df['Discord Username'] = "<@{}>".format(df._get_value(0, 'Discord Username'))
+    df['Discord Username'] = "@{}".format(df._get_value(0, 'Discord Username'))
     df.rename(columns = {'Medium Username':'Medium URL'}, inplace=True)
     df.rename(columns = {'Timestamp':'Registered on'}, inplace=True)
 
-    if admin:
-      return df.T.to_string(header=False)
-    else:
+    if not admin:
       columns = ['First Name', 'Second Name', 'Email Address',
                 'LinkedIn Profile', 'GitHub Profile', 'Medium URL']
-      return (df[columns]).T.to_string(header=False)
+      df = df[columns])
 
+    return df.add_suffix(' -  ').T.to_string(header=False).replace("  ","")
 
   def print_database(self):
     print(self.df)

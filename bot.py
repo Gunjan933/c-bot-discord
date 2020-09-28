@@ -75,13 +75,11 @@ async def shutdown(ctx):
     await ctx.send("You do not own this bot!")
 
 
-# @commands.Cog.listener()
-# async def on_member_join(self, member):
-#   channel = discord.utils.get(guild.text_channels, name="new-joiners")
-#   print(channel.id)
-#   ment = member.mention
-#   await self.client.get_channel(channel.id).send(f"{ment} has joined the server.")
-#   print(f"{member} has joined the server.")
+
+@bot.event
+async def on_member_join(member):
+  channel = discord.utils.get(member.guild.text_channels, name="new-joiners")
+  await channel.send(f"{member} has arrived!")
 
 
 bot.remove_command('help')
@@ -92,8 +90,8 @@ async def help(ctx):
   embed.add_field(name='-help', value='list of commands available', inline=False)
   embed.add_field(name='-search [discord ID | cainvas ID | email address]', value='searches for user', inline=False)
   embed.add_field(name='-ping', value='checks latency.', inline=False)
-  embed.add_field(name='-sync', value='syncs database (requires admin privilage)', inline=False)
-  embed.add_field(name='-shutdown', value='shuts down cainvas bot (requires ownership privilage)', inline=False)
+  embed.add_field(name='-sync', value='syncs database *(requires admin privilage)*', inline=False)
+  embed.add_field(name='-shutdown', value='shuts down cainvas bot *(requires ownership privilage)*', inline=False)
   await ctx.send(embed=embed)
 
 
