@@ -32,13 +32,13 @@ class google_spreadsheet():
   def update_spreadsheet(self, df=pd.DataFrame()):
     if df.empty:
       return
-    while True:
-      try:
-        gc = gspread.Client(auth=self.scopedCreds)
-        gc.session = AuthorizedSession(self.scopedCreds)
-        sheet = gc.open(self.sheetName).sheet1
-        sheet.update([df.columns.values.tolist()] + df.values.tolist())
-        break
-      except:
-        print("Authentication error, trying again")
-        pass
+    # while True:
+    #   try:
+    gc = gspread.Client(auth=self.scopedCreds)
+    gc.session = AuthorizedSession(self.scopedCreds)
+    sheet = gc.open(self.sheetName).sheet1
+    sheet.update([df.columns.values.tolist()] + df.values.tolist())
+      #   break
+      # except:
+      #   print("Authentication error, trying again")
+      #   pass

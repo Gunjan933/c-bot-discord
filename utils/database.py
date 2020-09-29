@@ -20,18 +20,18 @@ class bot_database:
 
 
   def sync_with_spreadsheet(self):
-    try:
-      self.form_df = self.form_sheet.get_spreadsheet_dataframe()
+    # try:
+    self.form_df = self.form_sheet.get_spreadsheet_dataframe()
 
-      self.database_df = self.df[['Email Address','Project']]
+    self.database_df = self.df[['Email Address','Project']]
 
-      self.df = pd.merge(self.form_df, self.database_df, how='left', on='Email Address')
+    self.df = pd.merge(self.form_df, self.database_df, how='left', on='Email Address')
 
-      self.df.to_json(self.database_name)
-      self.database_sheet.update_spreadsheet(self.df)
-      return True
-    except:
-      return False
+    self.df.to_json(self.database_name)
+    self.database_sheet.update_spreadsheet(self.df)
+    return True
+    # except:
+    #   return False
 
 
   def search(self, uniqueID, admin=False):
@@ -45,7 +45,8 @@ class bot_database:
     if df.empty:
       return "No users found with {}".format(uniqueID)
 
-    df['Medium Username'] = "https://medium.com/{}".format(df._get_value(0, 'Medium Username'))
+    if df._get_value(0, 'Medium Username').find("@") == 0:
+      df['Medium Username'] = "https://medium.com/{}".format(df._get_value(0, 'Medium Username'))
     df['Discord Username'] = "@{}".format(df._get_value(0, 'Discord Username'))
     df.rename(columns = {'Medium Username':'Medium URL'}, inplace=True)
     df.rename(columns = {'Timestamp':'Registered on'}, inplace=True)
@@ -53,7 +54,7 @@ class bot_database:
     if not admin:
       columns = ['First Name', 'Second Name', 'Email Address',
                 'LinkedIn Profile', 'GitHub Profile', 'Medium URL']
-      df = df[columns])
+      df = df([columns])
 
     return df.add_suffix(' -  ').T.to_string(header=False).replace("  ","")
 
