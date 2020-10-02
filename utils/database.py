@@ -27,6 +27,11 @@ class bot_database:
 
     self.df = pd.merge(self.form_df, self.database_df, how='left', on='Email Address')
 
+    self.df = self.df.rename(columns = {'Discord Username [Ex: Gunjan#0010]':'Discord Username','Medium Username':'Medium URL', 'Timestamp':'Registered on'})
+    self.df.fillna('', inplace=True)
+    # self.df['Discord Username'] = self.df['Discord Username']
+    self.df['Discord Username'] = ("@" + self.df['Discord Username'].str.replace(" ",""))
+    self.df.loc[~self.df['Medium URL'].str.contains('https://medium.com/'),'Medium URL'] = ("https://medium.com/" + self.df['Medium URL'])
     self.df.to_json(self.database_name)
     self.database_sheet.update_spreadsheet(self.df)
     return True
@@ -37,24 +42,17 @@ class bot_database:
   def search(self, uniqueID, admin=False):
     if self.df.empty:
       return "No users found with {}".format(uniqueID)
-    df = self.df.loc[
-                (self.df['Discord Username'] == uniqueID) |
-                (self.df['Cainvas Username'] == uniqueID) |
-                (self.df['Email Address'] == uniqueID)
-              ]
+    df = pd.DataFrame(self.df.loc[(self.df['Discord Username'] == "@"+uniqueID)
+                        | (self.df['Cainvas Username'] == uniqueID)
+                        | (self.df['Email Address'] == uniqueID)
+                      ])
     if df.empty:
       return "No users found with {}".format(uniqueID)
 
-    if df._get_value(0, 'Medium Username').find("@") == 0:
-      df['Medium Username'] = "https://medium.com/{}".format(df._get_value(0, 'Medium Username'))
-    df['Discord Username'] = "@{}".format(df._get_value(0, 'Discord Username'))
-    df.rename(columns = {'Medium Username':'Medium URL'}, inplace=True)
-    df.rename(columns = {'Timestamp':'Registered on'}, inplace=True)
-
     if not admin:
-      columns = ['First Name', 'Second Name', 'Email Address',
+      columns = ['First Name', 'Last Name', 'Email Address',
                 'LinkedIn Profile', 'GitHub Profile', 'Medium URL']
-      df = df([columns])
+      df = df[columns]
 
     return df.add_suffix(' -  ').T.to_string(header=False).replace("  ","")
 
