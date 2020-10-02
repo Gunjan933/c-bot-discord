@@ -2,6 +2,8 @@
 cainvas-scholar.json
 # cainvas_scholar database
 cainvas-scholar-database.json
+#ignore nohup output
+nohup.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

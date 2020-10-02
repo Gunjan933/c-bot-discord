@@ -1,10 +1,12 @@
+#!/usr/bin/python3
+
 import pandas as pd
 from utils.spreadsheet import google_spreadsheet
 
 class bot_database:
 
   def __init__(self):
-    self.database_name = 'cainvas-scholar-database.json'
+    self.database_name = '/home/ubuntu/c-bot-discord/cainvas-scholar-database.json'
     self.form_sheet_name = "Cainvas Scholar Registration (Responses)"
     self.form_sheet = google_spreadsheet(self.form_sheet_name)
     self.database_sheet_name = "Cainvas Scholar Database"
@@ -20,23 +22,22 @@ class bot_database:
 
 
   def sync_with_spreadsheet(self):
-    # try:
-    self.form_df = self.form_sheet.get_spreadsheet_dataframe()
+    try:
+      self.form_df = self.form_sheet.get_spreadsheet_dataframe()
+      self.database_df = self.df[['Email Address','Project']]
 
-    self.database_df = self.df[['Email Address','Project']]
+      self.df = pd.merge(self.form_df, self.database_df, how='left', on='Email Address')
 
-    self.df = pd.merge(self.form_df, self.database_df, how='left', on='Email Address')
-
-    self.df = self.df.rename(columns = {'Discord Username [Ex: Gunjan#0010]':'Discord Username','Medium Username':'Medium URL', 'Timestamp':'Registered on'})
-    self.df.fillna('', inplace=True)
-    # self.df['Discord Username'] = self.df['Discord Username']
-    self.df['Discord Username'] = ("@" + self.df['Discord Username'].str.replace(" ",""))
-    self.df.loc[~self.df['Medium URL'].str.contains('https://medium.com/'),'Medium URL'] = ("https://medium.com/" + self.df['Medium URL'])
-    self.df.to_json(self.database_name)
-    self.database_sheet.update_spreadsheet(self.df)
-    return True
-    # except:
-    #   return False
+      self.df = self.df.rename(columns = {'Discord Username [Ex: Gunjan#0010]':'Discord Username','Medium Username':'Medium URL', 'Timestamp':'Registered on'})
+      self.df.fillna('', inplace=True)
+      # self.df['Discord Username'] = self.df['Discord Username']
+      self.df['Discord Username'] = ("@" + self.df['Discord Username'].str.replace(" ",""))
+      self.df.loc[~self.df['Medium URL'].str.contains('https://medium.com/'),'Medium URL'] = ("https://medium.com/" + self.df['Medium URL'])
+      self.df.to_json(self.database_name)
+      self.database_sheet.update_spreadsheet(self.df)
+      return True
+    except:
+      return False
 
 
   def search(self, uniqueID, admin=False):

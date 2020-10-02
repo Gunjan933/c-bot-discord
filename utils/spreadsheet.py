@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import gspread
 import pandas as pd
 from google.oauth2 import service_account
@@ -7,7 +9,7 @@ class google_spreadsheet():
 
   def __init__(self, sheetName):
     self.sheetName = sheetName
-    self.googleAPI = 'cainvas-scholar.json'
+    self.googleAPI = '/home/ubuntu/c-bot-discord/cainvas-scholar.json'
     self.scope = ['https://www.googleapis.com/auth/drive']
     self.credentials = service_account.Credentials\
                         .from_service_account_file(self.googleAPI)
@@ -32,13 +34,13 @@ class google_spreadsheet():
   def update_spreadsheet(self, df=pd.DataFrame()):
     if df.empty:
       return
-    # while True:
-    #   try:
-    gc = gspread.Client(auth=self.scopedCreds)
-    gc.session = AuthorizedSession(self.scopedCreds)
-    sheet = gc.open(self.sheetName).sheet1
-    sheet.update([df.columns.values.tolist()] + df.values.tolist())
-      #   break
-      # except:
-      #   print("Authentication error, trying again")
-      #   pass
+    while True:
+      try:
+        gc = gspread.Client(auth=self.scopedCreds)
+        gc.session = AuthorizedSession(self.scopedCreds)
+        sheet = gc.open(self.sheetName).sheet1
+        sheet.update([df.columns.values.tolist()] + df.values.tolist())
+        break
+      except:
+        print("Authentication error, trying again")
+        pass

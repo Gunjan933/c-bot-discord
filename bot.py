@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import os, random, discord, asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -75,11 +77,15 @@ async def shutdown(ctx):
     await ctx.send("You do not own this bot!")
 
 
-
 @bot.event
 async def on_member_join(member):
   channel = discord.utils.get(member.guild.text_channels, name="new-joiners")
-  await channel.send(f"{member} has arrived!")
+  await channel.send(f"Hey {member.mention}, welcome to **Cainvas Scholar | AITS**!")
+
+@bot.event
+async def on_member_remove(member):
+  channel = discord.utils.get(member.guild.text_channels, name="new-joiners")
+  await channel.send(f"Ohh no, {member.mention} just left **Cainvas Scholar | AITS**!")
 
 
 bot.remove_command('help')
