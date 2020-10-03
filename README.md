@@ -27,8 +27,29 @@ Put these lines in a file called `bot.service` in `/etc/systemd/system`.
 
 Make sure your script file is executable by running `sudo chmod +x <full_path_to_script>`
 
-Now reload systemd by running `sudo systemctl daemon-reload`, start the service `sudo systemctl start bot`.
+Reload systemd by running
+```
+sudo systemctl daemon-reload
+```
+Start the service `
+```
+sudo systemctl start bot
+```
 
-Now you can check if the service is running or not using `sudo systemctl status bot`, stop it using `sudo systemctl stop bot` and restart is using `sudo systemctl restart bot`
+Now you can check if the service is running or not:
+```
+sudo systemctl status bot
+```
+Stop the service using:
+```
+sudo systemctl stop bot
+```
+Restart is using
+```
+sudo systemctl restart bot
+```
 
-Finally, use the enable command to ensure that the service starts whenever the system boots `sudo systemctl enable bot`
+Finally, use the enable command to ensure that the service starts whenever the system boots
+```
+sudo systemctl enable bot
+```
