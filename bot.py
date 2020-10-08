@@ -81,6 +81,8 @@ async def shutdown(ctx):
 async def on_member_join(member):
   channel = discord.utils.get(member.guild.text_channels, name="new-joiners")
   await channel.send(f"Hey {member.mention}, welcome to **Cainvas Scholar | AITS**!")
+  role = discord.utils.get(member.guild.roles, name="members")
+  await member.add_roles(role)
 
 @bot.event
 async def on_member_remove(member):
