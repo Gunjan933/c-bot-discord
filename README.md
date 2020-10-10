@@ -7,8 +7,7 @@ We can use `nohup` for this purpose too.
 ```bash
 nohup python bot.py &
 ```
-
-Also you can create a service for it if you are running Ubuntu 15.04 or newer you can create a simple systemd service file to run it as follows
+Else, also you can create a service for it if you are running Ubuntu 15.04 or newer you can create a simple systemd service file to run it as follows
 
 ```
 [Unit]
